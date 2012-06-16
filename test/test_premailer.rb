@@ -125,6 +125,21 @@ END_HTML
     end
   end
 
+  # In progress
+  def test_transform_ul_or_ol_to_table
+    source_html = File.expand_path(File.dirname(__FILE__)) + '/files/ul_ol.html'
+
+    # [:nokogiri, :hpricot].each do |adapter|
+    [:nokogiri].each do |adapter|
+      premailer = Premailer.new( source_html, {:adapter => adapter, :convert_lists => true} )
+      premailer.to_inline_css
+      doc = premailer.processed_doc
+
+      assert_not_nil doc.at('table.ul'), 'table.ul not found'
+      assert_not_nil doc.at('table.ol'), 'table.ol not found'
+    end
+  end
+
   def test_local_remote_check
     assert Premailer.local_data?( StringIO.new('a') )
     assert Premailer.local_data?( '/path/' )
