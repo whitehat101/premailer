@@ -211,6 +211,7 @@ class Premailer
                 :input_encoding => 'ASCII-8BIT',
                 :replace_html_entities => false,
                 :adapter => Adapter.use,
+                :convert_lists => false,
                 }.merge(options)
 
     @html_file = html
@@ -244,6 +245,7 @@ class Premailer
 
     @processed_doc = @doc
     @processed_doc = convert_inline_links(@processed_doc, @base_url) if @base_url
+    @processed_doc = convert_lists(@processed_doc) if @options[:convert_lists]
     if options[:link_query_string]
       @processed_doc = append_query_string(@processed_doc, options[:link_query_string])
     end
@@ -452,6 +454,43 @@ public
     doc
   end
 
+  def convert_lists doc
+    # Process <ul>
+    doc.search("ul").each do |ul|
+      ul.node_name = "table"
+      ul[:class] = (ul[:class].to_s.split(" ") << "ul").join " "
+
+      ul.children.wrap "<tr></tr>"
+
+      ul.children.each do |tr|
+        li = tr.child
+        li.before '<td class="bullet">&bull;</td>'
+
+        li.node_name = "td"
+        li[:class] = (li[:class].to_s.split(" ") << "li").join " "
+      end
+    end
+
+    # Process <ol>
+    doc.search("ol").each do |ol|
+      ol.node_name = "table"
+      ol[:class] = (ol[:class].to_s.split(" ") << "ol").join " "
+
+      ol.children.wrap "<tr></tr>"
+
+      index = 0
+      ol.children.each do |tr|
+        li = tr.child
+        index += 1
+        li.before "<td class='number'>#{index}.</td>"
+
+        li.node_name = "td"
+        li[:class] = (li[:class].to_s.split(" ") << "li").join " "
+      end
+    end
+
+    doc
+  end
 
   # @private
   def self.escape_string(str) # :nodoc:
