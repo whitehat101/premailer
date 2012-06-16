@@ -79,6 +79,68 @@ will result in
 <table cellspacing='5' width='500'>
 ```
 
+## Transform Lists into Tabular Lists
+My app needs to process user sbumitted content. Outlook is awful. Turning HTML <tt>&lt;ul&gt;</tt> and
+<tt>&lt;ol&gt;</tt> into table-based structures adds compatability for Outlook.
+
+Presently only nokogiri is supported for this feature. Fork away.
+
+Pass premailer :convert_lists => true, :adapter => :nokogiri
+
+```ruby
+Premailer.new 'http://example.com/myfile.html', :convert_lists => true, :adapter => :nokogiri
+```
+
+will turn this
+
+```html
+<ul>
+  <li>Lorem
+  <li>ipsum
+  <li>dolor
+</ul>
+```
+
+into this
+
+```html
+<table class="ul">
+<tr>
+  <td class="bullet">&bull;</td>
+  <td class="li">Lorem</td>
+</tr>
+<tr>
+  <td class="bullet">&bull;</td>
+  <td class="li">ipsum</td>
+</tr>
+<tr>
+  <td class="bullet">&bull;</td>
+  <td class="li">dolor</td>
+</tr>
+</table>
+```
+
+Likewise, <tt>&lt;ol&gt;</tt> are turned into
+
+```html
+<table class="ol">
+<tr>
+  <td class="number">1.</td>
+  <td class="li">Lorem</td>
+</tr>
+</table>
+```
+
+Processing user-submitted content can be tricy. I was tasked with turning user submitted content into a newsletter.
+In particular, Outlook fails to render standard HTML lists. When dealing with Microsoft products, it's always best to party like it's 1999. The transformation is performed before css styles are inlined, so you can use the classes on the
+table elements to style your table-list in a fairly natural style. Just remember it's a table, not a list anymore.
+
+```css
+.ul .bullet { color:red; -premailer-width: 42 }
+.ol .number { color:blue; -premailer-width: 42 }
+.ol .li, .ul .li { color:green; font-size:10pt }
+```
+
 ## Contributions
 
 Contributions are most welcome.  Premailer was rotting away in a private SVN repository for too long and could use some TLC.  Fork and patch to your heart's content.  Please don't increment the version numbers, though.
