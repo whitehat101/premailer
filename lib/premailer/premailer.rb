@@ -460,9 +460,9 @@ public
       ul.node_name = "table"
       ul[:class] = (ul[:class].to_s.split(" ") << "ul").join " "
 
-      ul.children.wrap "<tr></tr>"
+      ul.element_children.wrap "<tr></tr>"
 
-      ul.children.each do |tr|
+      ul.element_children.each do |tr|
         li = tr.child
         li.before '<td class="bullet">&bull;</td>'
 
@@ -476,10 +476,10 @@ public
       ol.node_name = "table"
       ol[:class] = (ol[:class].to_s.split(" ") << "ol").join " "
 
-      ol.children.wrap "<tr></tr>"
+      ol.element_children.wrap "<tr></tr>"
 
       index = 0
-      ol.children.each do |tr|
+      ol.element_children.each do |tr|
         li = tr.child
         index += 1
         li.before "<td class='number'>#{index}.</td>"
